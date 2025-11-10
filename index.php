@@ -2,6 +2,7 @@
 require_once 'config/database.php';
 require_once 'classes/Product.php';
 require_once 'classes/Brand.php';
+require_once 'includes/auth_check.php'; // Add authentication check to protect catalog access
 
 // Initialize database connection
 $database = new Database();
@@ -80,7 +81,42 @@ $bandwidthOptions = ['50 MHz', '100 MHz', '200 MHz', '500 MHz', '1 GHz'];
                             <?php endforeach; ?>
                         </form>
                     </div>
-                    <i class="fas fa-shopping-cart text-gray-600 text-xl"></i>
+                    <!-- Add user menu with logout functionality -->
+                    <div class="flex items-center space-x-4">
+                        <div class="relative group">
+                            <button class="flex items-center space-x-2 text-gray-600 hover:text-orange-600">
+                                <i class="fas fa-user-circle text-xl"></i>
+                                <span class="hidden md:inline"><?php echo htmlspecialchars($currentUser['username']); ?></span>
+                                <i class="fas fa-chevron-down text-sm"></i>
+                            </button>
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                <div class="py-2">
+                                    <div class="px-4 py-2 text-sm text-gray-500 border-b">
+                                        Signed in as <strong><?php echo htmlspecialchars($currentUser['username']); ?></strong>
+                                        <?php if ($currentUser['role'] === 'admin'): ?>
+                                            <span class="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded ml-2">Admin</span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-user mr-2"></i>Profile
+                                    </a>
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-cog mr-2"></i>Settings
+                                    </a>
+                                    <?php if ($currentUser['role'] === 'admin'): ?>
+                                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            <i class="fas fa-tools mr-2"></i>Admin Panel
+                                        </a>
+                                    <?php endif; ?>
+                                    <div class="border-t my-1"></div>
+                                    <a href="logout.php" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                        <i class="fas fa-sign-out-alt mr-2"></i>Sign Out
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <i class="fas fa-shopping-cart text-gray-600 text-xl"></i>
+                    </div>
                 </div>
             </div>
         </div>
