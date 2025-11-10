@@ -1,3 +1,9 @@
-Feature : Add user authentication
+Fix : error in index.php
 
-The current PHP project has no user authentication system. Added an authentication system with login functionality, session management, and access control. The system includes secure user registration and login functionality with persistent sessions using cookies, database-backed session management with automatic cleanup, and complete access protection for the catalog requiring users to log in before viewing products. The login page features a professional design with tabbed interface for both login and registration, includes demo credentials for testing, and provides proper error handling and user feedback throughout the authentication flow.
+After running the initilaisation sql files and changing the database.php to add my credentials its not working. setup.php ran successfully. I've added debugging tools to help identify the issue. Please run these diagnostic scripts to see what's happening:
+
+1. **debug.php** - Checks PHP extensions, database connection, table existence, and class loading
+2. **test_login.php** - Tests the authentication system specifically
+3. **Enhanced database.php** - Added better error reporting and connection validation
+
+Run `debug.php` first to see the system status, then `test_login.php` to test the authentication. This will help identify whether the issue is with database connection, missing tables, class loading, or the authentication logic itself.
