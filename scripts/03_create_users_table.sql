@@ -1,4 +1,6 @@
 -- Create users table and authentication system
+-- Added database creation to make script independent
+CREATE DATABASE IF NOT EXISTS oscilloscope_catalog;
 USE oscilloscope_catalog;
 
 -- Create users table

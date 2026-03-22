@@ -1,6 +1,6 @@
 <?php
 // Session configuration and cleanup handler
-class SessionHandler {
+class CustomSessionHandler {
     private $user;
     
     public function __construct($user) {

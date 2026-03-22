@@ -2,8 +2,8 @@
 class Database {
     private $host = 'localhost';
     private $db_name = 'oscilloscope_catalog';
-    private $username = 'root';
-    private $password = '';
+    private $username = 'remote_user';
+    private $password = 'Q<@|NxQ1K';
     private $conn;
 
     public function getConnection() {
@@ -30,4 +30,16 @@ class Database {
         return $this->conn;
     }
 }
+
+$host = 'localhost';
+$db_name = 'oscilloscope_catalog';
+$username = 'root';
+$password = '';
+
+$dsn = "mysql:host=$host;charset=utf8mb4";
+$options = [
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES => false,
+];
 ?>

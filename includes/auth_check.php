@@ -14,7 +14,7 @@ $user = new User($db);
 $auth = new Auth($user);
 
 // Initialize session handler
-$sessionHandler = new SessionHandler($user);
+$sessionHandler = new CustomSessionHandler($user);
 
 // Check if user is logged in
 if (!$auth->isLoggedIn()) {

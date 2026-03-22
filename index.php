@@ -4,6 +4,10 @@ require_once 'classes/Product.php';
 require_once 'classes/Brand.php';
 require_once 'includes/auth_check.php'; // Add authentication check to protect catalog access
 
+error_reporting(E_ALL);
+ini_set('display_errors', 'On');
+
+
 // Initialize database connection
 $database = new Database();
 $db = $database->getConnection();
@@ -11,6 +15,12 @@ $db = $database->getConnection();
 // Initialize classes
 $product = new Product($db);
 $brand = new Brand($db);
+
+if (!$currentUser) {
+    // If currentUser is null, redirect to login
+    header('Location: login.php?message=session_expired');
+    exit();
+}
 
 // Get filters from URL parameters
 $filters = [];
@@ -37,6 +47,34 @@ if (isset($_GET['sort'])) {
 $products = $product->getAll($filters);
 $totalProducts = $product->getCount($filters);
 $brands = $brand->getBrandCounts();
+
+
+$servername = 'localhost';
+$dbname = 'oscilloscope_catalog';
+$username = 'remote_user';
+$password = 'Q<@|NxQ1K';
+    
+$pdo = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+  // set the PDO error mode to exception
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+$stmt = $pdo->prepare("
+    SELECT b.product_id, u.first_name, u.last_name, b.end_date
+    FROM bookings b 
+    JOIN users u ON b.user_id = u.id 
+    WHERE b.status = 'active' 
+    AND b.start_date <= CURDATE() 
+    AND b.end_date >= CURDATE()
+");
+$stmt->execute();
+$currentBookings = [];
+while ($booking = $stmt->fetch()) {
+    $currentBookings[$booking['product_id']] = [
+        'holder' => $booking['first_name'] . ' ' . $booking['last_name'],
+        'end_date' => $booking['end_date']
+    ];
+}
+
 
 // Get unique bandwidth values for filter
 $bandwidthOptions = ['50 MHz', '100 MHz', '200 MHz', '500 MHz', '1 GHz'];
@@ -86,14 +124,16 @@ $bandwidthOptions = ['50 MHz', '100 MHz', '200 MHz', '500 MHz', '1 GHz'];
                         <div class="relative group">
                             <button class="flex items-center space-x-2 text-gray-600 hover:text-orange-600">
                                 <i class="fas fa-user-circle text-xl"></i>
-                                <span class="hidden md:inline"><?php echo htmlspecialchars($currentUser['username']); ?></span>
+                                <!-- Add null check for currentUser -->
+                                <span class="hidden md:inline"><?php echo htmlspecialchars($currentUser['username'] ?? 'User'); ?></span>
                                 <i class="fas fa-chevron-down text-sm"></i>
                             </button>
                             <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                                 <div class="py-2">
                                     <div class="px-4 py-2 text-sm text-gray-500 border-b">
-                                        Signed in as <strong><?php echo htmlspecialchars($currentUser['username']); ?></strong>
-                                        <?php if ($currentUser['role'] === 'admin'): ?>
+                                        <!-- Add null check for currentUser -->
+                                        Signed in as <strong><?php echo htmlspecialchars($currentUser['username'] ?? 'User'); ?></strong>
+                                        <?php if (($currentUser['role'] ?? '') === 'admin'): ?>
                                             <span class="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded ml-2">Admin</span>
                                         <?php endif; ?>
                                     </div>
@@ -103,7 +143,8 @@ $bandwidthOptions = ['50 MHz', '100 MHz', '200 MHz', '500 MHz', '1 GHz'];
                                     <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                         <i class="fas fa-cog mr-2"></i>Settings
                                     </a>
-                                    <?php if ($currentUser['role'] === 'admin'): ?>
+                                    <!-- Add null check for currentUser role -->
+                                    <?php if (($currentUser['role'] ?? '') === 'admin'): ?>
                                         <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                             <i class="fas fa-tools mr-2"></i>Admin Panel
                                         </a>
@@ -242,7 +283,8 @@ $bandwidthOptions = ['50 MHz', '100 MHz', '200 MHz', '500 MHz', '1 GHz'];
                         <div class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
                             <div class="p-4">
                                 <div class="aspect-square bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
-                                    <img src="<?php echo htmlspecialchars($productItem['image_url'] ?: '/placeholder.svg?height=200&width=200'); ?>" 
+                                    <!-- Updated fallback image path to point to public folder -->
+                                    <img src="<?php echo htmlspecialchars($productItem['image_url'] ?: '/public/placeholder.jpg'); ?>" 
                                          alt="<?php echo htmlspecialchars($productItem['name']); ?>" 
                                          class="max-w-full max-h-full object-contain">
                                 </div>
@@ -270,8 +312,29 @@ $bandwidthOptions = ['50 MHz', '100 MHz', '200 MHz', '500 MHz', '1 GHz'];
                                         <i class="fas fa-star text-yellow-400"></i>
                                         <span class="text-sm text-gray-600"><?php echo number_format($productItem['rating'], 1); ?> (<?php echo $productItem['review_count']; ?>)</span>
                                     </div>
-                                    <h3 class="font-semibold text-gray-900"><?php echo htmlspecialchars($productItem['name']); ?></h3>
+                                    <!-- Added hyperlink to product name -->
+                                    <h3 class="font-semibold text-gray-900">
+                                        <a href="product.php?id=<?php echo $productItem['id']; ?>" class="hover:text-orange-600 transition-colors">
+                                            <?php echo htmlspecialchars($productItem['name']); ?>
+                                        </a>
+                                    </h3>
                                     <p class="text-sm text-gray-600"><?php echo htmlspecialchars($productItem['description']); ?></p>
+                                    
+                                    <!-- Added current holder information -->
+                                    <div class="text-xs text-gray-500 bg-gray-50 p-2 rounded">
+                                        <div class="flex justify-between">
+                                            <span class="font-medium">Current Holder:</span>
+                                            <span>
+                                                <?php if (isset($currentBookings[$productItem['id']])): ?>
+                                                    <?php echo htmlspecialchars($currentBookings[$productItem['id']]['holder']); ?>
+                                                    <br><span class="text-red-600">Until <?php echo date('M j, Y', strtotime($currentBookings[$productItem['id']]['end_date'])); ?></span>
+                                                <?php else: ?>
+                                                    <span class="text-green-600">None - Available</span>
+                                                <?php endif; ?>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <span class="text-lg font-bold text-gray-900">£<?php echo number_format($productItem['price'], 2); ?></span>
@@ -288,10 +351,11 @@ $bandwidthOptions = ['50 MHz', '100 MHz', '200 MHz', '500 MHz', '1 GHz'];
                                                 Notify
                                             </button>
                                         <?php else: ?>
-                                            <button class="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 transition-colors">
-                                                <i class="fas fa-cart-plus mr-1"></i>
-                                                Add
-                                            </button>
+                                            <!-- Updated Add to Cart button to link to booking page -->
+                                            <a href="booking.php?product_id=<?php echo $productItem['id']; ?>" class="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 transition-colors inline-block">
+                                                <i class="fas fa-calendar-plus mr-1"></i>
+                                                Book
+                                            </a>
                                         <?php endif; ?>
                                     </div>
                                     <div class="text-xs text-gray-500 space-y-1">
