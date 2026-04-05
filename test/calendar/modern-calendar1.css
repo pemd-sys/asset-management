@@ -1,0 +1,91 @@
+/* ============ CALENDAR STYLES ============ */
+/* Scoped to .calendar to avoid affecting rest of page */
+
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    font-family: 'Segoe UI', Roboto, sans-serif; /* localized font */
+    color: #333;
+    max-width: 800px;
+    margin: 2rem auto;
+}
+
+/* Header */
+.calendar-header {
+    grid-column: span 7;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+}
+
+/* Day names */
+.calendar-day-name {
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 0.5rem 0;
+    color: #555;
+}
+
+/* Day cells */
+.calendar-day {
+    min-height: 100px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.calendar-day:hover {
+    background: #eef3ff;
+    transform: scale(1.02);
+}
+
+/* Filler days */
+.calendar-day.ignore {
+    background: #f1f1f1;
+    color: #aaa;
+}
+
+/* Selected day */
+.calendar-day.selected {
+    background: #4e73df;
+    color: #fff;
+    font-weight: 600;
+}
+
+/* Date number */
+.date-num {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* Events */
+.calendar-event {
+    margin-top: 4px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: #ff9800; /* default orange */
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Event color overrides */
+.calendar-event.red { background: #e74c3c; }
+.calendar-event.green { background: #2ecc71; }
+.calendar-event.blue { background: #3498db; }
+

@@ -1,0 +1,83 @@
+/* Calendar container */
+.calendar {
+    width: 100%;
+    background: #fdfdfd;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    font-family: "Segoe UI", Roboto, sans-serif;
+    color: #333;
+    overflow: hidden;
+}
+
+/* Header: month + year */
+.calendar .header {
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 600;
+    padding: 1rem;
+    background: #4e73df;
+    color: #fff;
+}
+
+/* Day names row */
+.calendar .day_name {
+    display: inline-block;
+    width: 14.28%;
+    text-align: center;
+    font-weight: 500;
+    font-size: 0.9rem;
+    padding: 0.5rem 0;
+    background: #f4f6f9;
+    color: #555;
+}
+
+/* Day cells */
+.calendar .day_num {
+    display: inline-block;
+    width: 14.28%;
+    height: 100px;
+    padding: 6px;
+    box-sizing: border-box;
+    border: 1px solid #f0f0f0;
+    background: #fff;
+    vertical-align: top;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    transition: background 0.2s ease;
+}
+
+.calendar .day_num:hover {
+    background: #f0f4ff;
+}
+
+/* Empty days (prev/next month) */
+.calendar .ignore {
+    color: #bbb;
+    background: #fafafa;
+}
+
+/* Selected day */
+.calendar .day_num.selected {
+    background: #4e73df;
+    color: #fff;
+    font-weight: 600;
+}
+
+/* Events */
+.calendar .event {
+    display: block;
+    margin-top: 4px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    background: #ff9800; /* default */
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.calendar .event.red { background: #e74c3c; }
+.calendar .event.green { background: #2ecc71; }
+.calendar .event.blue { background: #3498db; }
+
